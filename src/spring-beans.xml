@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="springCacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+        <property name="cacheManager" ref="ehcacheManager"/>
+    </bean>
+
+    <!--ehcache-->
+    <bean id="ehcacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation" value="classpath:shiro-ehcache.xml"/>
+	</bean>
+
+    <!-- 数据库连接池 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://182.119.175.130:3307/liverpool"/>
+        <property name="username" value="root"/>
+        <property name="password" value="wfmhbbwt"/>
+    </bean>
+    
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+    	<property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- DAO -->
+    <bean id="permissionDao" class="com.shiro.dao.PermissionDaoImpl">
+    	<property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id="roleDao" class="com.shiro.dao.RoleDaoImpl">
+    	<property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id="resourceDao" class="com.shiro.dao.ResourceDaoImpl">
+    	<property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id="organizationDao" class="com.shiro.dao.OrganizationDaoImpl">
+    	<property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id="userDao" class="com.shiro.dao.UserDaoImpl">
+    	<property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    
+    <bean id="userRunAsDao" class="com.shiro.dao.UserRunAsDaoImpl">
+    	<property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+
+    <!-- Service -->
+    <bean id="permissionService" class="com.shiro.service.PermissionServiceImpl">
+        <property name="permissionDao" ref="permissionDao"/>
+    </bean>
+    
+    <bean id="organizationService" class="com.shiro.service.OrganizationServiceImpl">
+        <property name="organizationDao" ref="organizationDao"/>
+    </bean>
+    
+    <bean id="resourceService" class="com.shiro.service.ResourceServiceImpl">
+        <property name="resourceDao" ref="resourceDao"/>
+    </bean>
+
+    <bean id="roleService" class="com.shiro.service.RoleServiceImpl">
+        <property name="roleDao" ref="roleDao"/>
+        <property name="resourceService" ref="resourceService"/>
+    </bean>
+
+    <bean id="userService" class="com.shiro.service.UserServiceImpl">
+        <property name="userDao" ref="userDao"/>
+        <property name="roleService" ref="roleService"/>
+        <!--property name="passwordHelper" ref="passwordHelper"/-->
+    </bean>
+    
+    <bean id="userRunAsService" class="com.shiro.service.UserRunAsServiceImpl">
+        <property name="roleDao" ref="roleDao"/>
+        <property name="userDao" ref="userDao"/>
+        <property name="UserRunAsDao" ref="userRunAsDao"/>
+    </bean>
+
+
+</beans>
